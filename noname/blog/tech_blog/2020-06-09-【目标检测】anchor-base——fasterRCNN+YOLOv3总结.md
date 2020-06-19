@@ -2,19 +2,19 @@
 ## anchor-base 方法：
 
 ### fasterRCNN：
-![image.png](blog/blog_imgs/fasterRCNN-fasterRCNN_arch.png)
+![Image.png](blog_imgs/fasterRCNN-fasterRCNN_arch.png)
 
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
 - 3、feature map 每个点都有anchor，anchor大小9种（3 scale * 3 ratio）
-![image.png](https://upload-images.jianshu.io/upload_images/9730793-3859f3182889e4cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Image.png](blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50*38*9=17100
 - 4、正负样例（positive:IOU>0.7, negative:IOU<0.3）
 - 5、NMS
 
 ### YOLOv3
-![image.png](blog/blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
+![image.png](blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 - 1、	one-stage
 - 2、	沙漏形网络，分辨率升高
