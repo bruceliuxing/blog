@@ -1,6 +1,6 @@
 # Great Responsibility Goes Upon Great Power
 
-![Image](https://github.com/bruceliuxing/bruceliuxing.github.io/blob/master/universe.jpeg)
+![Image](universe.jpeg)
 
 
 ## Technology
