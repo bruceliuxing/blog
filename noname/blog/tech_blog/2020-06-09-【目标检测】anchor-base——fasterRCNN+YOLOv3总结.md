@@ -14,15 +14,15 @@
 - 5、NMS
 
 ### YOLOv3
-![Image](../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
+![Image](../blog_imgs/fasterRCNN-yolov3_arch.png)
 
 - 1、	one-stage
 - 2、	沙漏形网络，分辨率升高
 - 3、	Anchor 不同分辨率下不同 scale 的 anchor
 
-![image.png](https://upload-images.jianshu.io/upload_images/9730793-b606e0d2a326097b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Image](../blog_imgs/fasterRCNN-yolov3_anchor.png)
 
-![image.png](https://upload-images.jianshu.io/upload_images/9730793-a1e16a98b88037dd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Image](../blog_imgs/fasterRCNN-yolov3_head.png)
 
 对于一个输入图像，比如416*416*3，相应的会输出 13*13*3 + 26*26*3 + 52*52*3 = 10647 个预测框
 - 4、NMS
