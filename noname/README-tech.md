@@ -2,8 +2,8 @@
 
 ### [线上markdown编辑——prose.io](https://prose.io/#bruceliuxing)
 ### hexo
-    - [从jekyll到hexo](https://wordzzzz.github.io/2018/01/10/HEXO/)
-    - [超详细Hexo+Github Page搭建技术博客教程](https://segmentfault.com/a/1190000017986794)
+>>- [从jekyll到hexo](https://wordzzzz.github.io/2018/01/10/HEXO/)
+>>- [超详细Hexo+Github Page搭建技术博客教程](https://segmentfault.com/a/1190000017986794)
 ## Books
 >>- [LDA漫游.pdf](blog/LDA漫游.pdf)
 
