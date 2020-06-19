@@ -2,7 +2,7 @@
 ## anchor-base 方法：
 
 ### fasterRCNN：
-![Image](../blog_imgs/fasterRCNN-fasterRCNN_arch.png =1000x800)
+![Image](../blog_imgs/fasterRCNN-fasterRCNN_arch.png)
 
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
