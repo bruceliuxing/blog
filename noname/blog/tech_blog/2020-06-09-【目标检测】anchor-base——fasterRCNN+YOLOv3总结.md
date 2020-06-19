@@ -20,7 +20,7 @@
 - 2、	沙漏形网络，分辨率升高
 - 3、	Anchor 不同分辨率下不同 scale 的 anchor
 
-![Image](../blog_imgs/fasterRCNN-yolov3_anchor.png)
+![Image](../blog_imgs/fasterRCNN-yolov3_arch_darknet.png)
 
 ![Image](../blog_imgs/fasterRCNN-yolov3_head.png)
 
