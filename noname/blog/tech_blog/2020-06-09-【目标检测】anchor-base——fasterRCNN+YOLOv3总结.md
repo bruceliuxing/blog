@@ -14,7 +14,7 @@
 - 5、NMS
 
 ### YOLOv3
-![image.png](blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
+![Image](../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 - 1、	one-stage
 - 2、	沙漏形网络，分辨率升高
@@ -31,3 +31,7 @@
 
 - 1、	region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域
 - 2、	物体可以用关键点来代替（降维：二维----->一维）
+
+
+## reference
+1. [yolov3算法精讲](https://www.cnblogs.com/ywheunji/p/10809695.html)
