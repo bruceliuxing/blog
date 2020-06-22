@@ -114,7 +114,8 @@
 
 ![Image](../../blog_imgs/egypt_all_gods.png)
 
-### 欧西里斯的故事
+
+##### [ 下一篇--拉神的故事](Egypt_Gods_2-ra.md)
 
 
 
