@@ -16,7 +16,7 @@
    * 2
 > ### 英国史
 > ### 美国史
-> ### 德国史
+> ### [德国史](blog/learning_blog/history/Germeny.md)
 
 ## Politic
 
