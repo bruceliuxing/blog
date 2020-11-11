@@ -69,6 +69,7 @@ Google在2015年使用基于DNN的GoogleLeNet智能封面生成算法，由于Yo
 有监督方式对每一关键帧构造了一个52维的向量，包含颜色、纹理、基础质量及构图四个方面。
 
 颜色方面主要是HSV统计量，如平均HSV, 中央平均HSV, HSV颜色直方图，HSV对比度，以及对比度，Pleasure, Arousel, Dominance.纹理方面则是基于Haralick特征, 包括Entropy, Energy, Homogeneity, GLCM。构图方面，则是三分法则、对称构图及原创性(Uniqueness， 这个有点虚)
+![](../images/VedioThumbnails-5.png)
 
 基础质量方面考察了四个维度，包含对比度平衡、曝光平衡、JPEG质量以及全局清晰度。
 
@@ -76,7 +77,7 @@ Google在2015年使用基于DNN的GoogleLeNet智能封面生成算法，由于Yo
 
 
 ## 实验结果：
-![](../images/VedioThumbnails-5.png)
+![](../images/VedioThumbnails-6.png)
 结果显示无监督方式效果最好。作者在文章中重点讲的是有监督的算法，而这个算法使用了大量不同维度的视觉特征，直观上应该是性能最好才对。猜测原因可能是数据集质量问题，导致美学分数偏差较大
 
 这篇文章的实现方法略显繁琐，手工特征工程非常费劲。不过，因为没有使用特别费时的算法(如DNN)，甚至可以只有无监督的方式下工作，处理的速度是其一大优势，非常适用作为一个baseline方法快速上线。
