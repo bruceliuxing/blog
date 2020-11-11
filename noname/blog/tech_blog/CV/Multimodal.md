@@ -24,4 +24,4 @@
 >- **Video Thumbnails**
 >> [To Click or Not To Click:Automatic Selection of Beautiful Thumbnails from Videos](https://arxiv.org/pdf/1609.01388.pdf)
 
->> 基于传统视觉学习方法，快速生成视频缩略封面图 ![more](VedioThumbnails_yahoo_click_or_not.md)
+>> 基于传统视觉学习方法，快速生成视频缩略封面图 [more](VedioThumbnails_yahoo_click_or_not.md)
