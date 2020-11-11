@@ -14,7 +14,7 @@
 >- **基于玻尔兹曼机的多模学习**
 >> [Multimodal learning with deep boltzman machine](https://www.cs.cmu.edu/~rsalakhu/papers/Multimodal_DBM.pdf) 
 
->> 论文中的实验通过 Bimodal DBM，学习图片和文本的联合概率分布 P(图片，文本)。在应用阶段，输入图片，利用条件概率 P(文本|图片)，生成文本特征，可以得到图片相应的文本描述；而输入文本，利用条件概率 P(图片|文本)，可以生成图片特征，通过检索出最靠近该特征向量的两个图片实例，可以得到符合文本描述的图片
+>> 论文中的实验通过 Bimodal DBM，学习图片和文本的联合概率分布 P(图片，文本)。在应用阶段，输入图片，利用条件概率 P(文本/图片)，生成文本特征，可以得到图片相应的文本描述；而输入文本，利用条件概率 P(图片/文本)，可以生成图片特征，通过检索出最靠近该特征向量的两个图片实例，可以得到符合文本描述的图片
 
 >- **VideoBERT**
 >> [VideoBERT: A Joint Model for Video and Language Representation Learning ](https://arxiv.org/pdf/1904.01766.pdf)
