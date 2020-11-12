@@ -90,4 +90,4 @@
 - [如何让机器来给视频选择封面？-知乎](https://zhuanlan.zhihu.com/p/38440310)
 - [多模态视频分析技术研究与应用](https://www.mdeditor.tw/pl/2FPy)
 - [视频中的关键帧提取-知乎](https://zhuanlan.zhihu.com/p/38289781)
-- [(GoogleAIBlog)Improving YouTube video thumbnails with deep neural nets](https://ai.googleblog.com/2015/10/improving-youtube-video-thumbnails-with.html)
+- [Improving YouTube video thumbnails with deep neural nets(GoogleAIBlog)](https://ai.googleblog.com/2015/10/improving-youtube-video-thumbnails-with.html)
