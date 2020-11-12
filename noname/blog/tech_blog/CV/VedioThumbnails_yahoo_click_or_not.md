@@ -84,3 +84,10 @@
 结果显示无监督方式效果最好。作者在文章中重点讲的是有监督的算法，而这个算法使用了大量不同维度的视觉特征，直观上应该是性能最好才对。猜测原因可能是数据集质量问题，导致美学分数偏差较大
 
 这篇文章的实现方法略显繁琐，手工特征工程非常费劲。不过，因为没有使用特别费时的算法(如DNN)，甚至可以只有无监督的方式下工作，处理的速度是其一大优势，非常适用作为一个baseline方法快速上线。
+
+### Reference
+- [视频提取关键帧提取-csdn](https://blog.csdn.net/Ailberty/article/details/109581016?utm_medium=distribute.pc_relevant_download.none-task-blog-baidujs-1.nonecase&depth_1-utm_source=distribute.pc_relevant_download.none-task-blog-baidujs-1.nonecase)
+- [如何让机器来给视频选择封面？-知乎](https://zhuanlan.zhihu.com/p/38440310)
+- [多模态视频分析技术研究与应用](https://www.mdeditor.tw/pl/2FPy)
+- [视频中的关键帧提取-知乎](https://zhuanlan.zhihu.com/p/38289781)
+- [(GoogleAIBlog)Improving YouTube video thumbnails with deep neural nets](https://ai.googleblog.com/2015/10/improving-youtube-video-thumbnails-with.html)
