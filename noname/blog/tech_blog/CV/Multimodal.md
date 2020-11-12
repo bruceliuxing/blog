@@ -12,16 +12,25 @@
 
 ### Paper
 - **基于玻尔兹曼机的多模学习**
+
   [Multimodal learning with deep boltzman machine](https://www.cs.cmu.edu/~rsalakhu/papers/Multimodal_DBM.pdf) 
 
   论文中的实验通过 Bimodal DBM，学习图片和文本的联合概率分布 P(图片，文本)。在应用阶段，输入图片，利用条件概率 P(文本/图片)，生成文本特征，可以得到图片相应的文本描述；而输入文本，利用条件概率 P(图片/文本)，可以生成图片特征，通过检索出最靠近该特征向量的两个图片实例，可以得到符合文本描述的图片
 
 - **VideoBERT**
+
    [VideoBERT: A Joint Model for Video and Language Representation Learning ](https://arxiv.org/pdf/1904.01766.pdf)
    
    借鉴了语言建模中十分成功的 BERT 模型，在它的基础上进行改进，从视频数据的向量量化和现有的语音识别输出结果上分别导出视觉 token 和语言学 token，然后在这些 token 的序列上学习双向联合分布。
 
 - **Video Thumbnails**
+
   [To Click or Not To Click:Automatic Selection of Beautiful Thumbnails from Videos](https://arxiv.org/pdf/1609.01388.pdf)
 
-  基于传统视觉学习方法，快速生成视频缩略封面图 [more](VedioThumbnails_yahoo_click_or_not.md)
+  基于传统视觉学习方法，快速生成视频缩略封面图 [click to more](VedioThumbnails_yahoo_click_or_not.md)
+
+- **Video2Gif**
+
+  [Video2GIF: Automatic Generation of Animated GIFs from Video](https://arxiv.org/pdf/1605.04850.pdf)
+  
+  3D卷积网络生成视频的片段Gif图 [click to more](Video2Gif.md) 
