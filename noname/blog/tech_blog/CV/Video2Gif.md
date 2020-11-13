@@ -45,9 +45,10 @@ author resume：[https://gyglim.github.io/me/](https://gyglim.github.io/me/)
   模型结果对比结果
   
   ![](../images/Video2Gif-5.png)
-  ![](../images/Video2Gif-6.png)
   
   nMSD(normalized MSD(average meaningful summary duration))表示的是一段视频中能挑出多少份有意义的片段。但是经过研究发现，这个数据跟视频本身的长度有很大的关系，因为长度越长的源视频就如同大海捞针，MSD会降低。因此采用了加入时长的影响因素。 nMSD值越小，表明模型效果约好。
+  
+  ![](../images/Video2Gif-6.png)
   
   文章的贡献在于：
   1、本文提出了一种鲁棒性很强Huber loss的RankNet网络来解决本问题的方法，并且采用了正负例对比处理，对噪声信息的把控较高。
