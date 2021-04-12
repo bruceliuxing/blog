@@ -25,7 +25,7 @@
         2、预测和目标回归系数之间的距离度量。
 3. position loss
 
-     ![Images](../../blog_imgs/asterRCNN-fasterRCNN_position_loss.png)
+     ![FasterRCNN position regression](../../blog_imgs/fasterRCNN-fasterRCNN_position_loss.png)
 
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
