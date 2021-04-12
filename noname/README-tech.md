@@ -21,3 +21,8 @@
 
 >### Video
 >>- [VideoThumbnails](blog/tech_blog/CV/VedioThumbnails_yahoo_click_or_not.md)
+>>
+
+## 产品逻辑
+>### 广告系统
+>>- [oCPC学习](blog/tech_blog/product/oCPC.md)
