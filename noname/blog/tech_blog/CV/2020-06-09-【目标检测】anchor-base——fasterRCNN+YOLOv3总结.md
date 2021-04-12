@@ -24,6 +24,7 @@
         1、RPN生成的bounding boxes被正确分类为前景/背景的比例
         2、预测和目标回归系数之间的距离度量。
 3. position loss
+
      ![FasterRCNN postion regression loss](../../blog_imgs/asterRCNN-fasterRCNN_position_loss.png)
 
 #### FasterRCNN 特点
