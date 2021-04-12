@@ -27,6 +27,8 @@
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
 - 3、feature map 每个点都有anchor，anchor大小9种（3 scale * 3 ratio）
+
+![FasterRCNN Network detail](../../blog_imgs/fasterRCNN-fasterRCNN_network_details.png)
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50*38*9=17100
