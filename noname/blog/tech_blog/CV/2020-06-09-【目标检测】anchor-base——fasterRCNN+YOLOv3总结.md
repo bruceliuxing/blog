@@ -4,6 +4,26 @@
 ### fasterRCNN：
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_arch.png)
 
+#### 训练过程
+* 两阶段
+  - 1、 Region Proposal Network(RPN)
+  
+        RPN网络只训练区分前景和背景Bbox，正负样例（positive:IOU>0.7, negative:IOU<0.3），故分类为2分类
+  - 2、 Head
+
+
+#### 注意问题
+1. 权重初始化
+
+     m.weight.data.normal_(0, math.sqrt(2. / n))，
+     
+     其中n为样本数据，对于每一层来说W来说，n就是前一层输出到这个节点连接的输入样本数量。
+     [具体推导细节](https://www.telesens.co/2018/04/09/initializing-weights-for-the-convolutional-and-fully-connected-layers/)
+  
+  
+3. 
+
+#### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
 - 3、feature map 每个点都有anchor，anchor大小9种（3 scale * 3 ratio）
