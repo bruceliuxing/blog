@@ -26,7 +26,9 @@
 3. position loss
 
      ![FasterRCNN position regression](../../blog_imgs/fasterRCNN-fasterRCNN_position_loss.png)
-
+4. Loss
+    
+    ![FasterRCNN Loss](../../blog_imgs/fasterRCNN-fasterRCNN_total_loss.png)
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
@@ -113,10 +115,16 @@
      * 置信度损失，判断预测框有无物体；
      
        如果一个预测框与所有真实框的 iou 都小于某个阈值，那么就判定它是背景，否则为前景（包含物体），这类似于在 Faster rcnn 里 RPN 功能。
-     * 框回归损失，仅当预测框内包含物体时计算；
+     * 框回归损失采用GIoU损失函数，仅当预测框内包含物体时计算；
        - 边界框的尺寸越小，bbox_loss_scale 的值就越大。实际上，我们知道 YOLOv1 里作者在 loss 里对宽高都做了开根号处理，这是为了弱化边界框尺寸对损失值的影响
        - respond_bbox 的意思是如果网格单元中包含物体，那么就会计算边界框损失
        - 两个边界框之间的 GIoU 值越大，giou 的损失值就会越小, 因此网络会朝着预测框与真实框重叠度较高的方向去优化。
+       ```
+        respond_bbox  = label[:, :, :, :, 4:5]  # 置信度，判断网格内有无物体
+        ...
+        bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
+        giou_loss = respond_bbox * bbox_loss_scale * (1 - giou)
+       ```
      * 分类损失，判断预测框内的物体属于哪个类别
           
        这里分类损失采用的是二分类的交叉熵，即把所有类别的分类问题归结为是否属于这个类别，这样就把多分类看做是二分类问题。
