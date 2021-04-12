@@ -1,5 +1,12 @@
 # Technological innovation is the first productivity
 
+
+## 产品逻辑
+>### 广告系统
+>>- [oCPC学习](blog/tech_blog/product/oCPC.md)
+
+
+
 ### [线上markdown编辑——prose.io](https://prose.io/#bruceliuxing)
 ### hexo
 >>- [从jekyll到hexo](https://wordzzzz.github.io/2018/01/10/HEXO/)
@@ -23,6 +30,3 @@
 >>- [VideoThumbnails](blog/tech_blog/CV/VedioThumbnails_yahoo_click_or_not.md)
 >>
 
-## 产品逻辑
->### 广告系统
->>- [oCPC学习](blog/tech_blog/product/oCPC.md)
