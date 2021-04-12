@@ -23,7 +23,8 @@
         
         1、RPN生成的bounding boxes被正确分类为前景/背景的比例
         2、预测和目标回归系数之间的距离度量。
-
+3. position loss
+     ![FasterRCNN postion regression loss](../../blog_imgs/asterRCNN-fasterRCNN_position_loss.png)
 
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
@@ -119,7 +120,22 @@
           
        这里分类损失采用的是二分类的交叉熵，即把所有类别的分类问题归结为是否属于这个类别，这样就把多分类看做是二分类问题。
        这样做的好处在于排除了类别的互斥性，特别是解决了因多个类别物体的重叠而出现漏检的问题。
+8. GIoU
+     边界框一般由左上角和右下角坐标所表示，即 (x1,y1,x2,y2)。那么，你发现这其实也是一个向量。向量的距离一般可以 L1 范数或者 L2 范数来度量。
+     但是在L1及L2范数取到相同的值时，实际上检测效果却是差异巨大的，直接表现就是预测和真实检测框的IoU值变化较大，这说明L1和L2范数不能很好的反映检测效果。
      
+     当 L1 或 L2 范数都相同的时候，发现 IoU 和 GIoU 的值差别都很大，这表明使用 L 范数来度量边界框的距离是不合适的。
+     
+     在这种情况下，学术界普遍使用 IoU 来衡量两个边界框之间的相似性。作者发现使用 IoU 会有两个缺点，导致其不太适合做损失函数:
+     * 预测框和真实框之间没有重合时，IoU 值为 0， 导致优化损失函数时梯度也为 0，意味着无法优化。
+     
+       例如，场景 A 和场景 B 的 IoU 值都为 0，但是显然场景 B 的预测效果较 A 更佳，因为两个边界框的距离更近( L 范数更小)
+       
+       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_1.png)
+     * 即使预测框和真实框之间相重合且具有相同的 IoU 值时，检测的效果也具有较大差异，如下图所示。
+       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_2.png)
+       
+ ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_3.png)
 ## Anchor-free
 
 - 1、	region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域
