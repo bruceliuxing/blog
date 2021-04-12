@@ -3,13 +3,7 @@
 
 ### fasterRCNN：
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_arch.png)
-
-#### 训练过程
-* 两阶段
-  - 1、 Region Proposal Network(RPN)
-  
-        RPN网络只训练区分前景和背景Bbox，正负样例（positive:IOU>0.7, negative:IOU<0.3），故分类为2分类
-  - 2、 Head
+![FasterRCNN Network detail](../../blog_imgs/fasterRCNN-fasterRCNN_network_details.png)
 
 
 #### 注意问题
@@ -21,6 +15,14 @@
      [具体推导细节](https://www.telesens.co/2018/04/09/initializing-weights-for-the-convolutional-and-fully-connected-layers/)
   
   
+2.   Region Proposal Network(RPN)
+  
+     RPN网络只训练区分前景和背景Bbox，正负样例（positive:IOU>0.7, negative:IOU<0.3），故分类为2分类
+        
+     RPN Loss：RPN损失函数是在优化过程中最小化以训练RPN网络的指标。损失函数是以下组合
+        
+        1、RPN生成的bounding boxes被正确分类为前景/背景的比例
+        2、预测和目标回归系数之间的距离度量。
 3. 
 
 #### FasterRCNN 特点
@@ -28,7 +30,6 @@
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
 - 3、feature map 每个点都有anchor，anchor大小9种（3 scale * 3 ratio）
 
-![FasterRCNN Network detail](../../blog_imgs/fasterRCNN-fasterRCNN_network_details.png)
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50*38*9=17100
