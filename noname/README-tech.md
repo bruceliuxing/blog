@@ -25,6 +25,7 @@
 
 >### Multimodal
 >>- [多模态](blog/tech_blog/CV/Multimodal.md)
+>>- [transformer](blog/tech_blog/CV/transformer.md)
 
 >### Video
 >>- [VideoThumbnails](blog/tech_blog/CV/VedioThumbnails_yahoo_click_or_not.md)
