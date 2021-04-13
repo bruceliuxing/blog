@@ -17,7 +17,7 @@
   
 2.   Region Proposal Network(RPN)
   
-     RPN网络只训练区分前景和背景Bbox，正负样例（positive:IOU>0.7, negative:IOU<0.3），故分类为2分类
+     RPN网络只训练区分前景和背景Bbox，正负样例（positive:IOU > 0.7, negative:IOU < 0.3），故分类为2分类
         
      RPN Loss：RPN损失函数是在优化过程中最小化以训练RPN网络的指标。损失函数是以下组合
         
@@ -32,12 +32,12 @@
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
-- 3、feature map 每个点都有anchor，anchor大小9种（3 scale * 3 ratio）
+- 3、feature map 每个点都有anchor，anchor大小9种（3 scale x 3 ratio）
 
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
 原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50*38*9=17100
-- 4、正负样例（positive:IOU>0.7, negative:IOU<0.3）
+- 4、正负样例（positive:IOU > 0.7, negative:IOU < 0.3）
 - 5、NMS
 
 
@@ -61,7 +61,7 @@
 ![Image](../../blog_imgs/fasterRCNN-yolov3_head.png)
 ![YOLOv3 architecture](../../blog_imgs/fasterRCNN-yolov3_arch_total.png)
 
-对于一个输入图像，比如416*416*3，相应的会输出 13*13*3 + 26*26*3 + 52*52*3 = 10647 个预测框
+对于一个输入图像，比如416 x 416 x 3，相应的会输出 13x13x3 + 26x26x3 + 52x52x3 = 10647 个预测框
 - 4、NMS
 
 #### 注意问题
@@ -82,6 +82,7 @@
      
      
 2. bbox的预测
+
      yolo v3对bbox进行预测的时候，采用了logistic regression。yolo v3每次对b-box进行predict时，输出和v2一样都是(tx,ty,tw,th,to), 然后通过公式1计算出绝对的(x, y, w, h, c)。
      
      logistic回归用于对anchor包围的部分进行一个目标性评分(objectness score)，（用于NMS），即这块位置是目标的可能性有多大。
@@ -108,7 +109,7 @@
      为什么不能只用 iou 最大的 anchor 去负责预测该物体？
      
      答：如果按照这种原则去分配正负样本，那么势必会导致正负样本的数量极其不均衡（正样本特别少，负样本特别多），这将使得模型在预测时会出现大量漏检的情况。
-     实际上很多目标检测网络都会避免这种情况，并     且尽量保持正负样本的数目相平衡。
+     实际上很多目标检测网络都会避免这种情况，并且尽量保持正负样本的数目相平衡。
      例如，SSD 网络就使用了 hard negative mining 的方法对负样本进行抽样，抽样时按照置信度误差（预测背景的置信度越小，误差越大）进行降序排列，选取误差较大的 top-k 作为训练的负样本，以保证正负样本的比例接近1:3。
 7. 损失函数
      在 YOLOv3 中，作者将目标检测任务看作目标区域预测和类别预测的回归问题, 因此它的损失函数也有些与众不同。
