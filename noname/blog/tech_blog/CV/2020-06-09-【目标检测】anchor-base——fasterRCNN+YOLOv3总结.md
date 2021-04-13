@@ -29,6 +29,7 @@
 4. Loss
     
     ![FasterRCNN Loss](../../blog_imgs/fasterRCNN-fasterRCNN_total_loss.png)
+5. NMS
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
@@ -36,9 +37,9 @@
 
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)
 
-原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50*38*9=17100
+原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50x38x9=17100
 - 4、正负样例（positive:IOU > 0.7, negative:IOU < 0.3）
-- 5、NMS
+- 5、NMS复杂
 
 
 
@@ -76,7 +77,7 @@
      
      k-means 度量距离的选取很关键。距离度量如果使用标准的欧氏距离，大框框就会比小框产生更多的错误。 Kmeans聚类度量方式为IOU。
      
-     分配上，在最小的13*13特征图上（有最大的感受野）应用较大的先验框(116x90)，(156x198)，(373x326)，适合检测较大的对象。中等的26*26
+     分配上，在最小的13x13特征图上（有最大的感受野）应用较大的先验框(116x90)，(156x198)，(373x326)，适合检测较大的对象。中等的26x26
      特征图上（中等感受野）应用中等的先验框(30x61)，(62x45)，(59x119)，适合检测中等大小的对象。较大的52*52特征图上（较小的感受野）应用
      较小的先验框(10x13)，(16x30)，(33x23)，适合检测较小的对象
      
@@ -98,6 +99,34 @@
      $\text{b}\_{h}$ 和 $\text{b}\_{w}$ 分别表示预测框的长宽, $\text{P}\_{h}$ 和 $\text{P}\_{w}$ 分别表示先验框的长和宽。
      
      $\text{t}\_{x}$ 和 $\text{t}\_{y}$ 分别表示物体中心距离网格左上角位置的偏移量, $\text{C}\_{x}$ 和 $\text{C}\_{y}$ 分别表示网格左上角的坐标。
+     
+     ```
+     def decode(conv_output, i=0):
+         # 这里的 i=0、1 或者 2， 以分别对应三种网格尺度
+         conv_shape  = tf.shape(conv_output)
+         batch_size  = conv_shape[0]
+         output_size = conv_shape[1]
+         conv_output = tf.reshape(conv_output, (batch_size, output_size, 
+                                                output_size, 3, 5 + NUM_CLASS))
+         conv_raw_dxdy = conv_output[:, :, :, :, 0:2] # 中心位置的偏移量
+         conv_raw_dwdh = conv_output[:, :, :, :, 2:4] # 预测框长宽的偏移量
+         conv_raw_conf = conv_output[:, :, :, :, 4:5] # 预测框的置信度
+         conv_raw_prob = conv_output[:, :, :, :, 5: ] # 预测框的类别概率
+         # 好了，接下来需要画网格了。其中，output_size 等于 13、26 或者 52
+         y = tf.tile(tf.range(output_size, dtype=tf.int32)[:, tf.newaxis], [1, output_size])
+         x = tf.tile(tf.range(output_size, dtype=tf.int32)[tf.newaxis, :], [output_size, 1])
+         xy_grid = tf.concat([x[:, :, tf.newaxis], y[:, :, tf.newaxis]], axis=-1)
+         xy_grid = tf.tile(xy_grid[tf.newaxis, :, :, tf.newaxis, :], [batch_size, 1, 1, 3, 1])
+         xy_grid = tf.cast(xy_grid, tf.float32) # 计算网格左上角的位置
+         # 根据上图公式计算预测框的中心位置
+         pred_xy = (tf.sigmoid(conv_raw_dxdy) + xy_grid) * STRIDES[i]
+         # 根据上图公式计算预测框的长和宽大小
+         pred_wh = (tf.exp(conv_raw_dwdh) * ANCHORS[i]) * STRIDES[i]
+         pred_xywh = tf.concat([pred_xy, pred_wh], axis=-1) 
+         pred_conf = tf.sigmoid(conv_raw_conf) # 计算预测框里object的置信度
+         pred_prob = tf.sigmoid(conv_raw_prob) # 计算预测框里object的类别概率
+         return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
+     ```
 5. NMS 
      在 YOLO 算法中，NMS 的处理有两种情况：一种是所有的预测框一起做 NMS 处理，另一种情况是分别对每个类别的预测框做 NMS 处理。后者会出现一个预测框既属于类别 A 又属于类别 B 的现象，这比较适合     于一个小单元格中同时存在多个物体的情况。
 6. 正负样本分配
@@ -111,6 +140,32 @@
      答：如果按照这种原则去分配正负样本，那么势必会导致正负样本的数量极其不均衡（正样本特别少，负样本特别多），这将使得模型在预测时会出现大量漏检的情况。
      实际上很多目标检测网络都会避免这种情况，并且尽量保持正负样本的数目相平衡。
      例如，SSD 网络就使用了 hard negative mining 的方法对负样本进行抽样，抽样时按照置信度误差（预测背景的置信度越小，误差越大）进行降序排列，选取误差较大的 top-k 作为训练的负样本，以保证正负样本的比例接近1:3。
+     
+     ```
+     # 流程1: 判断边界框的数目是否大于0
+     while len(cls_bboxes) > 0:
+         # 流程2: 按照 socre 排序选出评分最大的边界框 A
+         max_ind = np.argmax(cls_bboxes[:, 4])
+         # 将边界框 A 取出并剔除
+         best_bbox = cls_bboxes[max_ind]
+         best_bboxes.append(best_bbox)
+         cls_bboxes = np.concatenate([cls_bboxes[: max_ind], cls_bboxes[max_ind + 1:]])
+         # 流程3: 计算这个边界框 A 与剩下所有边界框的 iou 并剔除那些 iou 值高于阈值的边界框
+         iou = bboxes_iou(best_bbox[np.newaxis, :4], cls_bboxes[:, :4])
+         weight = np.ones((len(iou),), dtype=np.float32)
+         iou_mask = iou > iou_threshold
+         weight[iou_mask] = 0.0
+         cls_bboxes[:, 4] = cls_bboxes[:, 4] * weight
+         score_mask = cls_bboxes[:, 4] > 0.
+         cls_bboxes = cls_bboxes[score_mask]
+     ```
+     
+     ```
+     # # (5) discard some boxes with low scores
+          classes = np.argmax(pred_prob, axis=-1)
+          scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes]
+          score_mask = scores > score_threshold
+     ```
 7. 损失函数
      在 YOLOv3 中，作者将目标检测任务看作目标区域预测和类别预测的回归问题, 因此它的损失函数也有些与众不同。
      * 置信度损失，判断预测框有无物体；
