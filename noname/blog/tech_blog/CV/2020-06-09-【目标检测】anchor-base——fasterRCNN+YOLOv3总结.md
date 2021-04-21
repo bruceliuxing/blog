@@ -29,7 +29,13 @@
 4. Loss
     
     ![FasterRCNN Loss](../../blog_imgs/fasterRCNN-fasterRCNN_total_loss.png)
-5. NMS
+5. NMS  
+- **RPN网络的inference**
+- 1. 【Anchor Generation Layer】层生成9中不同比例的anchor， 然后在featureMap上像素点为参照，对应到原图上anchor大小，每一个featureMap的点都对应9种不同尺寸的anchor。  
+- 2. 【Proposal Layer】根据bounding boxes回归系数转换anchor以生成转换后的anchors。然后利用anchor作为前景的概率应用非极大值抑制来修剪anchor的数量。  
+- 3. 【Proposal Target Layer】目标是修剪proposal layer生成的anchor列表，并生成特定类的bounding box回归目标(后面的head bbox回归层训练用到)，可用于训练分类层以生成良好的类别标签和回归目标  
+- **RPN网络的trainning**
+- 1. 【】
 #### FasterRCNN 特点
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
@@ -39,7 +45,8 @@
 
 原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50x38x9=17100
 - 4、正负样例（positive:IOU > 0.7, negative:IOU < 0.3）
-- 5、NMS复杂
+- 5、NMS复杂  
+
 
 
 
