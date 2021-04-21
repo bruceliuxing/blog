@@ -1,15 +1,15 @@
 
 ## anchor-base 方法：
 
-### fasterRCNN：
+## fasterRCNN：
 ![Image](../../blog_imgs/fasterRCNN-fasterRCNN_arch.png)
 ![FasterRCNN Network detail](../../blog_imgs/fasterRCNN-fasterRCNN_network_details.png)
 
 - 1、two-stage，先训练 RPN，再训练 head 网络分支
 - 2、feature map 分辨率低，M/2^5,对小目标检测效果有限
 - 3、feature map 每个点都有anchor，anchor大小9种（3 scale x 3 ratio）
-- 4、正负样例（positive:IOU > 0.7, negative:IOU < 0.3）
-- 5、NMS复杂  
+- 4、RPN阶段正负样例（positive:IOU > 0.7, negative:IOU < 0.3）和分类时候的正负样例不同，且不同阶段参与loss计算的方式不一样
+- 5、NMS
 
 #### 注意问题
 1. 权重初始化
@@ -28,7 +28,12 @@
         
         1、RPN生成的bounding boxes被正确分类为前景/背景的比例
         2、预测和目标回归系数之间的距离度量。
-3. position loss
+3. position loss  
+     两组bounding box回归系数之间的差异  
+     *  一组由RPN网络产生  
+          用于训练RPN层以产生良好的前景bounding boxes（更紧密地围绕对象边界）。目标回归系数，即将ROI框与其最接近的ground truth的bounding box对齐所需的系数由anchor target layer生成   
+     *  一组由HEAD网络产生
+          第二组bounding box系数由分类层生成。这些系数是类特定的，即对于每个ROI框，每个对象类生成一组系数。这些目标回归系数由proposal target layer生成。注意，分类网络在方形feature map上操作，该方形feature map是应用于head网络输出的仿射变换（如上所述）的结果。然而，由于回归系数对于没有剪切的仿射变换是不变的，因此可以将由proposal target layer计算的目标回归系数与由分类网络产生的目标回归系数进行比较，并且充当有效学习信号。  
 
      ![FasterRCNN position regression](../../blog_imgs/fasterRCNN-fasterRCNN_position_loss.png)
 4. Loss
@@ -36,46 +41,64 @@
     ![FasterRCNN Loss](../../blog_imgs/fasterRCNN-fasterRCNN_total_loss.png)
 5. NMS  
 - 1. RPN网络种的Proposal Layer阶段，featureMap上每个像素点9种不同尺寸的bbox根据预测回归系数得到转换后的anchor，然后利用NMS修剪bbox作为前景bbox
-- 2. 
+
 
 #### FasterRCNN 特点
 - **RPN网络的inference**
-- 1. 【Anchor Generation Layer】层生成9中不同比例的anchor， 然后在featureMap上像素点为参照，对应到原图上anchor大小，每一个featureMap的点都对应9种不同尺寸的anchor  
-![anchor generatation](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)   
-原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50x38x9=17100  
-- 2. 【Proposal Layer】根据bounding boxes回归系数转换anchor以生成转换后的anchors。然后利用anchor作为前景的概率应用非极大值抑制来修剪anchor的数量。  
-![Proposal layer](../../blog_imgs/fasterRCNN-fasterRCNN_proposal.png)  
-- 3. 【Proposal Target Layer】生成后续head层训练ground-truth数据。目标是修剪proposal layer生成的anchor列表（包含bbox在featureMap上的精确位置插值等等），并生成特定类的bounding box回归目标(后面的head bbox回归层训练用到)，可用于训练分类层以生成良好的类别标签和回归目标  
+     - 【Anchor Generation Layer】层生成9中不同比例的anchor， 然后在featureMap上像素点为参照，对应到原图上anchor大小，每一个featureMap的点都对应9种不同尺寸的anchor  
+     ![anchor generatation](../../blog_imgs/fasterRCNN-fasterRCNN_anchor.png)   
+     原图800x600，VGG下采样16倍，feature map每个点设置9个Anchor，所以50x38x9=17100  
+     - 【Proposal Layer】根据bounding boxes回归系数转换anchor以生成转换后的anchors。然后利用anchor作为前景的概率应用非极大值抑制来修剪anchor的数量。  
+     ![Proposal layer](../../blog_imgs/fasterRCNN-fasterRCNN_proposal.png)  
+     - 【Proposal Target Layer】   
+     生成后续head层训练ground-truth数据。目标是修剪proposal layer生成的anchor列表（包含bbox在featureMap上的精确位置插值等等），并生成特定类的bounding  box回归目标(后面的head bbox回归层训练用到)，可用于训练分类层以生成良好的类别标签和回归目标   
+     
+     使用每个ROI与所有groud truth boxes的最大重叠，它将ROI分类为背景和前景ROI。前景ROI是最大重叠超过阈值的那些（TRAIN.FG_THRESH，默认值：0.5）。背景ROI是最大重叠落在TRAIN.BG_THRESH_LO和TRAIN.BG_THRESH_HI之间的值（默认值分别为0.1,0.5）。这是用于向分类器提供困难背景样本的“难例挖掘”的示例。  
+     接下来，在每个ROI和最接近的匹配ground truth box之间计算bounding box目标回归目标（这也包括背景ROI，因为这些ROI也存在重叠的ground truth）。这些回归目标针对所有类进行了扩展，如下图所示。  
+     背景ROI（困难样本）的回归系数ground-truth值均为0，回归过程就是把这些背景ROI逼近到0，也就是使得模型尽量不预测出这些背景区域。  
+     
+     
+     **输入**: proposal layer生成的ROI + ground truth信息
+     **输出**:  选择符合重叠标准的前景和背景ROI。 + ROI的类特定目标回归系数
+     **参数**：     
+          *  TRAIN.FG_THRESH :(默认值：0.5）用于选择前景ROI。与ground truth最大重叠超过FG_THRESH的ROI标记为前景  
+          *  TRAIN.BG_THRESH_HI :(默认为0.5）  
+          *  TRAIN.BG_THRESH_LO:(默认为0.1）这两个阈值用于选择背景ROI。最大重叠位于BG_THRESH_HI和BG_THRESH_LO之间的ROI标记为背景  
+          *  TRAIN.BATCH_SIZE :(默认为128）所选的前景和背景框的最大数量。  
+          *  TRAIN.FG_FRACTION :(默认为0.25）。前景框的数量不能超过BATCH_SIZE * FG_FRACTION。如果找到的背景区域太少，它会尝试通过随机重复一些背景索引来填补批次，以弥补不足。  
+
 - **RPN网络的trainning**
 - 1. 【Anchor Target Layer】 生成RPN网络训练过程中的所需数据    
       **输入**: RPN网络输出（预测的前景/背景类标签，回归系数）+ Anchor boxes（由anchor generation layer生成） + Ground truth boxes  
-      **输出**: 良好的前景/背景框和相关的类标签 + 目标回归系数  
+      **输出**: 良好的前景/背景框和相关的类标签 + 目标回归系数   
       **预测值**：为背景/前景二分类概率值， 所有前景bbox的回归系数   
       
       **ground-truth**：   
-      为正样本【featureMap每个像素9个尺寸形成所有anchors与所有前景bbox中IOU>0.7的anchor】  
-      负样本【所有anchors与所有前景bbox中IOU<0.3的anchors】  
-      既不是前景也不是背景的框（重叠> RPN_NEGATIVE_OVERLAP但<RPN_POSITIVE_OVERLAP的框）被标记为“不关心”。这些框不包括在RPN损失的计算中。     
+          为正样本【featureMap每个像素9个尺寸形成所有anchors与所有前景bbox中IOU>0.7的anchor】  
+          负样本【所有anchors与所有前景bbox中IOU<0.3的anchors】  
+          既不是前景也不是背景的框（RPN_NEGATIVE_OVERLAP < 重叠 < RPN_POSITIVE_OVERLAP的框）被标记为“不关心”。这些框不包括在RPN损失的计算中。     
       
       其中ground-truth 正样本中分为两种类型:  
-      **类型A**：对于每个ground truth box，所有与ground truth box具有最大IoU重叠的前景框  
-      **类型B**：与某些ground truth box的最大重叠超过阈值的Anchor boxes。 
-      
+          **类型A**：对于每个ground truth box，所有与ground truth box具有最大IoU重叠的前景框  
+           **类型B**：与某些ground truth box的最大重叠超过阈值的Anchor boxes。 
+      **参数**  
       TRAIN.RPN_BATCHSIZE：背景和前景anchor的总数（默认值：256）  
       TRAIN.RPN_FG_FRACTION：batch size中前景anchor的比例（默认值：0.5）。如果找到的前景anchors大于TRAIN.RPN_BATCHSIZE×TRAIN.RPN_FG_FRACTION，则超出（索引是随机选择的）标记为“不关心”。  
+      
 - 2. 【RPN Loss】  
       RPN生成的bounding boxes被正确分类为前景/背景的比例, 分类损失使用交叉熵损失惩罚错误分类的框  
       预测和目标回归系数之间的距离度量, 回归损失使用真实回归系数之间的距离函数smoothL1距离（使用前景anchor最近匹配的ground truth计算）和网络预测的回归系数  
 - **HEAD层训练**
 - 1. 【ROI Pooling Layer】  
       实现空间转换的网络，在给定proposal target layer生成的region proposals的bounding boxes坐标的情况下对输入feature map进行采样。这些坐标通常不在整数边界上，因此需要基于插值的采样  
-- 2. 【】
+- 2. 【classification layer】  
+      方形feature maps通过沿空间维度的aaverage pooling，将feature map传递到ResNet的layer 4，得到（代码中称为“fc7”）是每个ROI的一维特征向量。特征向量通过两个全连接得到（N x 21 + N x 4）  
 
 
 
 
 
-### YOLOv3
+## YOLOv3
 作者在YOLO算法中把物体检测（object detection）问题处理成回归问题，并将图像分为S×S的网格。如果一个目标的中心落入格子，该格子就负责检测该目标。
 
 每个网格都会输出 bounding box，confidence 和 class probability map。其中：
