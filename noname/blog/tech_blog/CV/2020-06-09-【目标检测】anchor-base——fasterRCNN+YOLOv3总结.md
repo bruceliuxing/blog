@@ -58,8 +58,8 @@
      背景ROI（困难样本）的回归系数ground-truth值均为0，回归过程就是把这些背景ROI逼近到0，也就是使得模型尽量不预测出这些背景区域。  
      
      
-     **输入**: proposal layer生成的ROI + ground truth信息
-     **输出**:  选择符合重叠标准的前景和背景ROI。 + ROI的类特定目标回归系数
+     **输入**: proposal layer生成的ROI + ground truth信息  
+     **输出**:  选择符合重叠标准的前景和背景ROI。 + ROI的类特定目标回归系数  
      **参数**：     
           *  TRAIN.FG_THRESH :(默认值：0.5）用于选择前景ROI。与ground truth最大重叠超过FG_THRESH的ROI标记为前景  
           *  TRAIN.BG_THRESH_HI :(默认为0.5）  
