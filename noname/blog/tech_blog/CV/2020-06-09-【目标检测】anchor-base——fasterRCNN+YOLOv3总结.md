@@ -48,8 +48,8 @@
 - 3. 【Proposal Target Layer】生成后续head层训练ground-truth数据。目标是修剪proposal layer生成的anchor列表（包含bbox在featureMap上的精确位置插值等等），并生成特定类的bounding box回归目标(后面的head bbox回归层训练用到)，可用于训练分类层以生成良好的类别标签和回归目标  
 - **RPN网络的trainning**
 - 1. 【Anchor Target Layer】 生成RPN网络训练过程中的所需数据    
-      **输入** RPN网络输出（预测的前景/背景类标签，回归系数）+ Anchor boxes（由anchor generation layer生成） + Ground truth boxes  
-      **输出** 良好的前景/背景框和相关的类标签 + 目标回归系数  
+      **输入**: RPN网络输出（预测的前景/背景类标签，回归系数）+ Anchor boxes（由anchor generation layer生成） + Ground truth boxes  
+      **输出**: 良好的前景/背景框和相关的类标签 + 目标回归系数  
       **预测值**：为背景/前景二分类概率值， 所有前景bbox的回归系数  
       **ground-truth**： 
       为正样本【featureMap每个像素9个尺寸形成所有anchors与所有前景bbox中IOU>0.7的anchor】  
