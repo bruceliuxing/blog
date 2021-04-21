@@ -50,14 +50,17 @@
 - 1. 【Anchor Target Layer】 生成RPN网络训练过程中的所需数据    
       **输入**: RPN网络输出（预测的前景/背景类标签，回归系数）+ Anchor boxes（由anchor generation layer生成） + Ground truth boxes  
       **输出**: 良好的前景/背景框和相关的类标签 + 目标回归系数  
-      **预测值**：为背景/前景二分类概率值， 所有前景bbox的回归系数  
-      **ground-truth**： 
+      **预测值**：为背景/前景二分类概率值， 所有前景bbox的回归系数   
+      
+      **ground-truth**：   
       为正样本【featureMap每个像素9个尺寸形成所有anchors与所有前景bbox中IOU>0.7的anchor】  
       负样本【所有anchors与所有前景bbox中IOU<0.3的anchors】  
-      既不是前景也不是背景的框（重叠> RPN_NEGATIVE_OVERLAP但<RPN_POSITIVE_OVERLAP的框）被标记为“不关心”。这些框不包括在RPN损失的计算中。      
+      既不是前景也不是背景的框（重叠> RPN_NEGATIVE_OVERLAP但<RPN_POSITIVE_OVERLAP的框）被标记为“不关心”。这些框不包括在RPN损失的计算中。     
+      
       其中ground-truth 正样本中分为两种类型:  
       **类型A**：对于每个ground truth box，所有与ground truth box具有最大IoU重叠的前景框  
-      **类型B**：与某些ground truth box的最大重叠超过阈值的Anchor boxes。  
+      **类型B**：与某些ground truth box的最大重叠超过阈值的Anchor boxes。 
+      
       TRAIN.RPN_BATCHSIZE：背景和前景anchor的总数（默认值：256）  
       TRAIN.RPN_FG_FRACTION：batch size中前景anchor的比例（默认值：0.5）。如果找到的前景anchors大于TRAIN.RPN_BATCHSIZE×TRAIN.RPN_FG_FRACTION，则超出（索引是随机选择的）标记为“不关心”。  
 - 2. 【RPN Loss】  
