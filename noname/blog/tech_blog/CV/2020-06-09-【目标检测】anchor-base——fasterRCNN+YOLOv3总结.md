@@ -148,18 +148,17 @@
      
      logistic回归用于对anchor包围的部分进行一个目标性评分(objectness score)，（用于NMS），即这块位置是目标的可能性有多大。
      
-     v3预测bbox只预测一个最准确的；在训练过程中yolov3是预测9个anchors的，对于loss的计算是找到iou最大的哪个，但是预测的时候只选一个最精确的。
-3. 对象分类softmax改成logistic
+     v3预测bbox只预测一个最准确的；在训练过程中yolov3是预测9个anchors的，对于loss的计算是找到iou最大的哪个，但是预测的时候只选一个最精确的。  
+     
+3. 对象分类softmax改成logistic  
      预测对象类别时不使用softmax，改成使用logistic的输出进行预测。这样能够支持多标签对象（比如一个人有Woman 和 Person两个标签） 
-4. decode处理
+     
+4. decode处理  
      YOLOv3 网络的三个分支输出会被送入 decode 函数中对 Feature Map 的通道信息进行解码。 在下面这幅图里：黑色虚线框代表先验框(anchor)，蓝色框表示的是预测框.
      
-     ![Image](../../blog_imgs/fasterRCNN-yolov3_decode_position.png)
-     
-     $\text{b}\_{h}$ 和 $\text{b}\_{w}$ 分别表示预测框的长宽, $\text{P}\_{h}$ 和 $\text{P}\_{w}$ 分别表示先验框的长和宽。
-     
-     $\text{t}\_{x}$ 和 $\text{t}\_{y}$ 分别表示物体中心距离网格左上角位置的偏移量, $\text{C}\_{x}$ 和 $\text{C}\_{y}$ 分别表示网格左上角的坐标。
-     
+     ![Image](../../blog_imgs/fasterRCNN-yolov3_decode_position.png)  
+     $\text{b}\_{h}$ 和 $\text{b}\_{w}$ 分别表示预测框的长宽, $\text{P}\_{h}$ 和 $\text{P}\_{w}$ 分别表示先验框的长和宽。  
+     $\text{t}\_{x}$ 和 $\text{t}\_{y}$ 分别表示物体中心距离网格左上角位置的偏移量, $\text{C}\_{x}$ 和 $\text{C}\_{y}$ 分别表示网格左上角的坐标。  
      ```
      def decode(conv_output, i=0):
          # 这里的 i=0、1 或者 2， 以分别对应三种网格尺度
@@ -188,7 +187,11 @@
          return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
      ```
 5. NMS 
-     在 YOLO 算法中，NMS 的处理有两种情况：一种是所有的预测框一起做 NMS 处理，另一种情况是分别对每个类别的预测框做 NMS 处理。后者会出现一个预测框既属于类别 A 又属于类别 B 的现象，这比较适合     于一个小单元格中同时存在多个物体的情况。
+     在 YOLO 算法中，NMS 的处理有两种情况：
+     - 一种是所有的预测框一起做 NMS 处理  
+     - 另一种情况是分别对每个类别的预测框做 NMS 处理  
+     后者会出现一个预测框既属于类别 A 又属于类别 B 的现象，这比较适合于一个小单元格中同时存在多个物体的情况。  
+     
 6. 正负样本分配
      * 如果 Anchor 与 Ground-truth Bounding Boxes 的 IoU > 0.3，标定为正样本;
      * 在第 1 种规则下基本能够产生足够多的样本，但是如果它们的 iou 不大于 0.3，那么只能把 iou 最大的那个 Anchor 标记为正样本，这样便能保证每个 Ground-truth 框都至少匹配一个先验框
