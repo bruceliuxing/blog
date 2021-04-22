@@ -45,9 +45,7 @@
 6. predict_box & anchor_box  & ground-truth_box 之间的关系
      - RPN网络是去拟合anchor_box  & 与它最近（度量为IOU）ground-truth_box 之间的偏差，anchor_box  & ground-truth_box之间通过IOU大小划分正负anchor样本
      - RPN中的predict_box & ground-truth_box之间去计算回传loss
-     - HEAD层
-
-
+     - HEAD层中的predict_box是拟合每一个具体类别所属的box和修正过的anchor_box之间的偏差，也就是inference过程中的预测值
 
 
 #### FasterRCNN 特点
@@ -197,10 +195,9 @@
      
      按照上述原则，一个 ground-truth 框会同时与多个先验框进行匹配。
      
-     为什么不能只用 iou 最大的 anchor 去负责预测该物体？
-     
-     答：如果按照这种原则去分配正负样本，那么势必会导致正负样本的数量极其不均衡（正样本特别少，负样本特别多），这将使得模型在预测时会出现大量漏检的情况。
-     实际上很多目标检测网络都会避免这种情况，并且尽量保持正负样本的数目相平衡。
+     为什么不能只用 iou 最大的 anchor 去负责预测该物体？  
+     答：如果按照这种原则去分配正负样本，那么势必会导致正负样本的数量极其不均衡（正样本特别少，负样本特别多），这将使得模型在预测时会出现大量漏检的情况。  
+     实际上很多目标检测网络都会避免这种情况，并且尽量保持正负样本的数目相平衡。  
      例如，SSD 网络就使用了 hard negative mining 的方法对负样本进行抽样，抽样时按照置信度误差（预测背景的置信度越小，误差越大）进行降序排列，选取误差较大的 top-k 作为训练的负样本，以保证正负样本的比例接近1:3。
      
      ```
@@ -230,9 +227,9 @@
      ```
 7. 损失函数
      在 YOLOv3 中，作者将目标检测任务看作目标区域预测和类别预测的回归问题, 因此它的损失函数也有些与众不同。
-     * 置信度损失，判断预测框有无物体；【predict_box & groundtruth_box】
-     
-       如果一个预测框与所有真实框的 iou 都小于某个阈值，那么就判定它是背景，否则为前景（包含物体），这类似于在 Faster rcnn 里 RPN 功能。
+     * 置信度损失，判断预测框有无物体；【predict_box & groundtruth_box】  
+       如果一个预测框与所有真实框的 iou 都小于某个阈值，那么就判定它是背景，否则为前景（包含物体），这类似于在 Faster rcnn 里 RPN 功能。  
+       
      * 框回归损失采用GIoU损失函数，仅当预测框内包含物体时计算；
        - 边界框的尺寸越小，bbox_loss_scale 的值就越大。实际上，我们知道 YOLOv1 里作者在 loss 里对宽高都做了开根号处理，这是为了弱化边界框尺寸对损失值的影响
        - respond_bbox 的意思是如果网格单元中包含物体，那么就会计算边界框损失
@@ -242,31 +239,64 @@
         ...
         bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
         giou_loss = respond_bbox * bbox_loss_scale * (1 - giou)
-       ```
-     * 分类损失，判断预测框内的物体属于哪个类别
-          
+       ```  
+       
+     * 分类损失，判断预测框内的物体属于哪个类别  
        这里分类损失采用的是二分类的交叉熵，即把所有类别的分类问题归结为是否属于这个类别，这样就把多分类看做是二分类问题。
-       这样做的好处在于排除了类别的互斥性，特别是解决了因多个类别物体的重叠而出现漏检的问题。
+       这样做的好处在于排除了类别的互斥性，特别是解决了因多个类别物体的重叠而出现漏检的问题。  
+      
 8. GIoU
-     边界框一般由左上角和右下角坐标所表示，即 (x1,y1,x2,y2)。那么，你发现这其实也是一个向量。向量的距离一般可以 L1 范数或者 L2 范数来度量。
-     但是在L1及L2范数取到相同的值时，实际上检测效果却是差异巨大的，直接表现就是预测和真实检测框的IoU值变化较大，这说明L1和L2范数不能很好的反映检测效果。
+     边界框一般由左上角和右下角坐标所表示，即 (x1,y1,x2,y2)。那么，你发现这其实也是一个向量。向量的距离一般可以 L1 范数或者 L2 范数来度量。  
+     但是在L1及L2范数取到相同的值时，实际上检测效果却是差异巨大的，直接表现就是预测和真实检测框的IoU值变化较大，这说明L1和L2范数不能很好的反映检测效果。  
+     当 L1 或 L2 范数都相同的时候，发现 IoU 和 GIoU 的值差别都很大，这表明使用 L 范数来度量边界框的距离是不合适的。  
      
-     当 L1 或 L2 范数都相同的时候，发现 IoU 和 GIoU 的值差别都很大，这表明使用 L 范数来度量边界框的距离是不合适的。
-     
-     在这种情况下，学术界普遍使用 IoU 来衡量两个边界框之间的相似性。作者发现使用 IoU 会有两个缺点，导致其不太适合做损失函数:
-     * 预测框和真实框之间没有重合时，IoU 值为 0， 导致优化损失函数时梯度也为 0，意味着无法优化。
-     
-       例如，场景 A 和场景 B 的 IoU 值都为 0，但是显然场景 B 的预测效果较 A 更佳，因为两个边界框的距离更近( L 范数更小)
+     在这种情况下，学术界普遍使用 IoU 来衡量两个边界框之间的相似性。作者发现使用 IoU 会有两个缺点，导致其不太适合做损失函数:  
+     * 预测框和真实框之间没有重合时，IoU 值为 0， 导致优化损失函数时梯度也为 0，意味着无法优化。  
+       例如，场景 A 和场景 B 的 IoU 值都为 0，但是显然场景 B 的预测效果较 A 更佳，因为两个边界框的距离更近( L 范数更小)  
+       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_1.png)  
        
-       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_1.png)
-     * 即使预测框和真实框之间相重合且具有相同的 IoU 值时，检测的效果也具有较大差异，如下图所示。
-       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_2.png)
+     * 即使预测框和真实框之间相重合且具有相同的 IoU 值时，检测的效果也具有较大差异，如下图所示。  
+       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_2.png)  
+       ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_3.png)  
        
- ![Image](../../blog_imgs/fasterRCNN-yolov3_giou_3.png)
-## Anchor-free
+9. predict_box & anchor_box  & ground-truth_box 之间的关系  
+     - anchor_box 和 ground-truth_box之间通过GIOU划分正负样本（positive：>0.7, negtive: <0.3）
+     - 把anchor_box移动到np.floor(w,h|ground-truth_box) + 0.5的位置去计算GIOU的
+     - anchor_box只关心能不能框到物体，不关心是否准确框到物体
+     - predict_box 和 ground-truth_box之间计算回传loss去实现精细准确框偏差  
+     ```
+     for i in range(3): # 针对 3 种网格尺寸
+         # 设定变量，用于存储每种网格尺寸下 3 个 anchor 框的中心位置和宽高
+         anchors_xywh = np.zeros((self.anchor_per_scale, 4))
+         # 将这 3 个 anchor 框都偏移至网格中心
+         anchors_xywh[:, 0:2] = np.floor(bbox_xywh_scaled[i, 0:2]).astype(np.int32) + 0.5
+         # 填充这 3 个 anchor 框的宽和高
+         anchors_xywh[:, 2:4] = self.anchors[i]
+         # 计算真实框与 3 个 anchor 框之间的 iou 值
+         iou_scale = self.bbox_iou(bbox_xywh_scaled[i][np.newaxis, :], anchors_xywh)
+         iou.append(iou_scale)
+         # 找出 iou 值大于 0.3 的 anchor 框
+         iou_mask = iou_scale > 0.3
+         exist_positive = False
+         if np.any(iou_mask): # 规则 1: 对于那些 iou > 0.3 的 anchor 框，做以下处理
+          # 根据真实框的坐标信息来计算所属网格左上角的位置
+             xind, yind = np.floor(bbox_xywh_scaled[i, 0:2]).astype(np.int32)
+             label[i][yind, xind, iou_mask, :] = 0
+             # 填充真实框的中心位置和宽高
+             label[i][yind, xind, iou_mask, 0:4] = bbox_xywh
+             # 设定置信度为 1.0，表明该网格包含物体
+             label[i][yind, xind, iou_mask, 4:5] = 1.0
+             # 设置网格内 anchor 框的类别概率，做平滑处理
+             label[i][yind, xind, iou_mask, 5:] = smooth_onehot
+             exist_positive = True
+         if not exist_positive: # 规则 2: 所有 iou 都不大于0.3， 那么只能选择 iou 最大的
+          best_anchor_ind = np.argmax(np.array(iou).reshape(-1), axis=-1)
+     ```
 
-- 1、	region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域
-- 2、	物体可以用关键点来代替（降维：二维----->一维）
+
+## Anchor-free  
+     1. region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域  
+     2. 物体可以用关键点来代替（降维：二维----->一维）  
 
 
 ## reference
