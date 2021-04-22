@@ -35,12 +35,19 @@
      *  一组由HEAD网络产生
           第二组bounding box系数由分类层生成。这些系数是类特定的，即对于每个ROI框，每个对象类生成一组系数。这些目标回归系数由proposal target layer生成。注意，分类网络在方形feature map上操作，该方形feature map是应用于head网络输出的仿射变换（如上所述）的结果。然而，由于回归系数对于没有剪切的仿射变换是不变的，因此可以将由proposal target layer计算的目标回归系数与由分类网络产生的目标回归系数进行比较，并且充当有效学习信号。  
 
-     ![FasterRCNN position regression](../../blog_imgs/fasterRCNN-fasterRCNN_position_loss.png)
+     ![FasterRCNN position regression](../../blog_imgs/fasterRCNN-fasterRCNN_position_loss.png)  
+     x, y, w, h 分别表示 boxes 的中心坐标和宽高；变量 x, x_{a}, x^{*} 则分别代表预测框，anchor 框和 ground-truth 框的中心坐标 x   
 4. Loss
     
     ![FasterRCNN Loss](../../blog_imgs/fasterRCNN-fasterRCNN_total_loss.png)
 5. NMS  
-- 1. RPN网络种的Proposal Layer阶段，featureMap上每个像素点9种不同尺寸的bbox根据预测回归系数得到转换后的anchor，然后利用NMS修剪bbox作为前景bbox
+- 1. RPN网络种的Proposal Layer阶段，featureMap上每个像素点9种不同尺寸的bbox根据预测回归系数得到转换后的anchor，然后利用NMS修剪bbox作为前景bbox  
+6. predict_box & anchor_box  & ground-truth_box 之间的关系
+     - RPN网络是去拟合anchor_box  & 与它最近（度量为IOU）ground-truth_box 之间的偏差，anchor_box  & ground-truth_box之间通过IOU大小划分正负anchor样本
+     - RPN中的predict_box & ground-truth_box之间去计算回传loss
+     - HEAD层
+
+
 
 
 #### FasterRCNN 特点
@@ -223,7 +230,7 @@
      ```
 7. 损失函数
      在 YOLOv3 中，作者将目标检测任务看作目标区域预测和类别预测的回归问题, 因此它的损失函数也有些与众不同。
-     * 置信度损失，判断预测框有无物体；
+     * 置信度损失，判断预测框有无物体；【predict_box & groundtruth_box】
      
        如果一个预测框与所有真实框的 iou 都小于某个阈值，那么就判定它是背景，否则为前景（包含物体），这类似于在 Faster rcnn 里 RPN 功能。
      * 框回归损失采用GIoU损失函数，仅当预测框内包含物体时计算；
