@@ -92,7 +92,7 @@
 - 1. 【ROI Pooling Layer】  
       实现空间转换的网络，在给定proposal target layer生成的region proposals的bounding boxes坐标的情况下对输入feature map进行采样。这些坐标通常不在整数边界上，因此需要基于插值的采样  
 - 2. 【classification layer】  
-      方形feature maps通过沿空间维度的aaverage pooling，将feature map传递到ResNet的layer 4，得到（代码中称为“fc7”）是每个ROI的一维特征向量。特征向量通过两个全连接得到（N x 21 + N x 4）  
+      方形feature maps通过沿空间维度的aaverage pooling，将feature map传递到ResNet的layer 4，得到（代码中称为“fc7”）是每个ROI的一维特征向量。  特征向量通过两个全连接得到（N x 21 + N x 4）  
 
 
 
