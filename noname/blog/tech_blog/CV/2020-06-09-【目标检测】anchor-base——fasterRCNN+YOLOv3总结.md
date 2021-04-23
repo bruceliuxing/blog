@@ -305,6 +305,6 @@
 ## reference
 1. [yolov3算法精讲](https://www.cnblogs.com/ywheunji/p/10809695.html)
 2. [物体检测丨Faster R-CNN详解](https://www.cnblogs.com/vincent1997/p/10889171.html)
-3. [*（推荐）*Object Detection and Classification using R-CNNs](https://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
+3. [(*推荐*) Object Detection and Classification using R-CNNs](https://www.telesens.co/2018/03/11/object-detection-and-classification-using-r-cnns/)
 4. [YOLOv3 算法的一点理解](https://yunyang1994.gitee.io/2018/12/28/YOLOv3/)
-5. [*（推荐）* 你一定从未看过如此通俗易懂的YOLO系列(从v1到v5)模型解读](https://www.zhihu.com/column/c_1277731121250934784)
+5. [(*推荐*) 你一定从未看过如此通俗易懂的YOLO系列(从v1到v5)模型解读](https://www.zhihu.com/column/c_1277731121250934784)
