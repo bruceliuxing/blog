@@ -267,6 +267,7 @@
      - anchor_box只关心能不能框到物体，不关心是否准确框到物体
      - predict_box 和 ground-truth_box之间计算回传loss去实现精细准确框偏差  
      - predict_box偏移量是基于Anchor框的宽和高和grid的先验位置的偏移量， 宽高是以anchor的宽高为参照，中心位置以grid为参照
+     - 回归宽高的anchor是和ground-truth最贴合IOU最大的那个作为参照，一个GT只有一个相应的anchor，正样本比例较少
      ```
      for i in range(3): # 针对 3 种网格尺寸
          # 设定变量，用于存储每种网格尺寸下 3 个 anchor 框的中心位置和宽高
@@ -298,8 +299,18 @@
 10. YOLOv3与yolov1-v2的区别
      - YOLO v1一次能检测49个目标，98个框，并且2个框对应一个类别。可以是大目标也可以是小目标。因为输出的尺寸是：[N, 7, 7, 30]。式中N为图片数量，7,7为49个区域(grid)。 30=2 x 5(c,x,y,w,h) + 1 x 20 cls   
      - YOLO v2首先把 7 x 7 个区域改为 13 x 13个区域，每个区域有5个anchor(kmeans聚类得出的超参数)，且每个anchor对应着1个类别，那么，输出的尺寸就应该为：[N,13,13,125]。125=5 x 5(c, x,y,w,h) + 5 x 20cls  
-     - YOLO v2的检测头已经由YOLO v1的  7 x 7 个区域改为 13 x 13个区域了，我们看YOLO v3检测头分叉了，分成了3部分(13 x 13, 26 x x26, 52 x 52)
+     - YOLO v2的检测头已经由YOLO v1的  7 x 7 个区域改为 13 x 13个区域了，我们看YOLO v3检测头分叉了，分成了3部分(13 x 13, 26 x x26, 52 x 52)  
 
+11. 各个训练过程
+     - yolov1的训练
+          * 先使用224 * 224的分辨率训练分类网络，再切换到448 * 448的分辨率训练检测网络
+     - yolov2的训练
+          * 先在 ImageNet 分类数据集上预训练 Darknet-19，此时模型输入为 224 * 224 ，共训练 160 个 epochs。(为什么可以这样训练？因为有GAP)
+          * 将网络的输入调整为 448 * 448（注意在测试的时候使用 416 * 416 大小） ，继续在 ImageNet 数据集上 finetune 分类模型，训练 10 个 epochs。注意为什么测试的时候使用大小？答案是：将输入图像大小从448 ×448 更改为 416 ×416 。这将创建奇数空间维度(7×7 v.s 8 ×8 grid cell)。 图片的中心通常被大目标占据。 对于奇数网格单元，可以更容易确定目标所属的位置。对于一些大目标，它们中心点往落入图片中心位置，此时使用特征图中心的1个cell去预测这些目标的bounding box相对容易些，否则就要用中间4个Cells来进行预测。
+          * 修改 Darknet-19 分类模型为检测模型,移除最后一个卷积层、global avgpooling 层以及 softmax 层，并且新增了3个 3 * 3 * 1024 卷积层，同时增加了一个 passthrough 层，最后使用 1 * 1 卷积层输出预测结果，并在检测数据集上继续finetune 网络。
+     - yolov3的训练
+          * darknet 53指的是convolution层有52层+1个conv层把1024个channel调整为1000个， 在ImageNet上先train的backbone，
+          * 再观察发现YOLO v3没有Pooling layer了，用的是conv(stride = 2)进行下采样，因为Pooling layer，不管是MaxPooling还是Average Pooling，本质上都是下采样减少计算量，本质上就是不更新参数的conv，但是他们会损失信息，所以用的是conv(stride = 2)进行下采样。
 
 ## Anchor-free  
      1. region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域  
