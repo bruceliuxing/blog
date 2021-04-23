@@ -154,8 +154,7 @@
      预测对象类别时不使用softmax，改成使用logistic的输出进行预测。这样能够支持多标签对象（比如一个人有Woman 和 Person两个标签） 
      
 4. decode处理  
-     YOLOv3 网络的三个分支输出会被送入 decode 函数中对 Feature Map 的通道信息进行解码。 在下面这幅图里：黑色虚线框代表先验框(anchor)，蓝色框表示的是预测框.
-     
+     YOLOv3 网络的三个分支输出会被送入 decode 函数中对 Feature Map 的通道信息进行解码。 在下面这幅图里：GT如红色的框所示，Anchor如紫色的框所示, 黑色虚线框代表先验框(anchor)，蓝色框表示的是预测框.   
      ![Image](../../blog_imgs/fasterRCNN-yolov3_decode_position.png)  
      $\text{b}\_{h}$ 和 $\text{b}\_{w}$ 分别表示预测框的长宽, $\text{P}\_{h}$ 和 $\text{P}\_{w}$ 分别表示先验框的长和宽。  
      $\text{t}\_{x}$ 和 $\text{t}\_{y}$ 分别表示物体中心距离网格左上角位置的偏移量, $\text{C}\_{x}$ 和 $\text{C}\_{y}$ 分别表示网格左上角的坐标。  
