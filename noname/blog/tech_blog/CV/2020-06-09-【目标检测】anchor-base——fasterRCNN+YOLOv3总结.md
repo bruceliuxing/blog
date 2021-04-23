@@ -266,6 +266,7 @@
      - 把anchor_box移动到np.floor(w,h|ground-truth_box) + 0.5的位置去计算GIOU的
      - anchor_box只关心能不能框到物体，不关心是否准确框到物体
      - predict_box 和 ground-truth_box之间计算回传loss去实现精细准确框偏差  
+     - predict_box偏移量是基于Anchor框的宽和高和grid的先验位置的偏移量， 宽高是以anchor的宽高为参照，中心位置以grid为参照
      ```
      for i in range(3): # 针对 3 种网格尺寸
          # 设定变量，用于存储每种网格尺寸下 3 个 anchor 框的中心位置和宽高
@@ -294,6 +295,10 @@
          if not exist_positive: # 规则 2: 所有 iou 都不大于0.3， 那么只能选择 iou 最大的
           best_anchor_ind = np.argmax(np.array(iou).reshape(-1), axis=-1)
      ```
+10. YOLOv3与yolov1-v2的区别
+     - YOLO v1一次能检测49个目标，98个框，并且2个框对应一个类别。可以是大目标也可以是小目标。因为输出的尺寸是：[N, 7, 7, 30]。式中N为图片数量，7,7为49个区域(grid)。 30=2 x 5(c,x,y,w,h) + 1 x 20 cls   
+     - YOLO v2首先把 7 x 7 个区域改为 13 x 13个区域，每个区域有5个anchor(kmeans聚类得出的超参数)，且每个anchor对应着1个类别，那么，输出的尺寸就应该为：[N,13,13,125]。125=5 x 5(c, x,y,w,h) + 5 x 20cls  
+     - YOLO v2的检测头已经由YOLO v1的  7 x 7 个区域改为 13 x 13个区域了，我们看YOLO v3检测头分叉了，分成了3部分(13 x 13, 26 x x26, 52 x 52)
 
 
 ## Anchor-free  
