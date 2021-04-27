@@ -64,7 +64,7 @@
      
      
      **输入**: proposal layer生成的ROI + ground truth信息  
-     **输出**:  选择符合重叠标准的前景和背景ROI。 + ROI的类特定目标回归系数  
+     **输出**:  选择符合重叠标准的前景和背景ROI。 + ROI的类特定目标回归系数    
      **参数**：     
           *  TRAIN.FG_THRESH :(默认值：0.5）用于选择前景ROI。与ground truth最大重叠超过FG_THRESH的ROI标记为前景  
           *  TRAIN.BG_THRESH_HI :(默认为0.5）  
@@ -100,7 +100,7 @@
       方形feature maps通过沿空间维度的aaverage pooling，将feature map传递到ResNet的layer 4，得到（代码中称为“fc7”）是每个ROI的一维特征向量。  特征向量通过两个全连接得到（N x 21 + N x 4）  
 
 
-
+---
 
 
 ## YOLOv3
@@ -267,7 +267,7 @@
      - anchor_box只关心能不能框到物体，不关心是否准确框到物体
      - predict_box 和 ground-truth_box之间计算回传loss去实现精细准确框偏差  
      - predict_box偏移量是基于Anchor框的宽和高和grid的先验位置的偏移量， 宽高是以anchor的宽高为参照，中心位置以grid为参照
-     - 回归宽高的anchor是和ground-truth最贴合IOU最大的那个作为参照，一个GT只有一个相应的anchor，正样本比例较少
+     - （理解有误）~~回归宽高的anchor是和ground-truth最贴合IOU最大的那个作为参照，一个GT只有一个相应的anchor，正样本比例较少~~
      ```
      for i in range(3): # 针对 3 种网格尺寸
          # 设定变量，用于存储每种网格尺寸下 3 个 anchor 框的中心位置和宽高
