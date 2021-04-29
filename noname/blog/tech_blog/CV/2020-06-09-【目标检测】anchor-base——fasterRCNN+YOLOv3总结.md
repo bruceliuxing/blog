@@ -311,7 +311,108 @@
      - yolov3的训练
           * darknet 53指的是convolution层有52层+1个conv层把1024个channel调整为1000个， 在ImageNet上先train的backbone，
           * 再观察发现YOLO v3没有Pooling layer了，用的是conv(stride = 2)进行下采样，因为Pooling layer，不管是MaxPooling还是Average Pooling，本质上都是下采样减少计算量，本质上就是不更新参数的conv，但是他们会损失信息，所以用的是conv(stride = 2)进行下采样。
+          
+12. yolov3 ground-truth
+     - Gt2YoloTarget
+          * 对featureMap的每一个位置，原尺寸降采样为grid，每个像素对应三个anchor，target尺寸：(len(mask)==3, 6 + self.num_classes, grid_h, grid_w)   
+          * 3部分(13 x 13, 26 x x26, 52 x 52) 每个部分featureMap的每个三个anchor匹配IOU最大的去计算target，剩下的依据IOU>thresh的填入
+          ```
+          def __call__(self, samples, context=None):
+        assert len(self.anchor_masks) == len(self.downsample_ratios), \
+            "anchor_masks', and 'downsample_ratios' should have same length."
 
+        h, w = samples[0]['image'].shape[1:3]
+        an_hw = np.array(self.anchors) / np.array([[w, h]])
+        for sample in samples:
+            # im, gt_bbox, gt_class, gt_score = sample
+            im = sample['image']
+            gt_bbox = sample['gt_bbox']
+            gt_class = sample['gt_class']
+            if 'gt_score' not in sample:
+                sample['gt_score'] = np.ones(
+                    (gt_bbox.shape[0], 1), dtype=np.float32)
+            gt_score = sample['gt_score']
+            for i, (
+                    mask, downsample_ratio
+            ) in enumerate(zip(self.anchor_masks, self.downsample_ratios)):
+                grid_h = int(h / downsample_ratio)
+                grid_w = int(w / downsample_ratio)
+                target = np.zeros(
+                    (len(mask), 6 + self.num_classes, grid_h, grid_w),
+                    dtype=np.float32)
+                for b in range(gt_bbox.shape[0]):
+                    gx, gy, gw, gh = gt_bbox[b, :]
+                    cls = gt_class[b]
+                    score = gt_score[b]
+                    if gw <= 0. or gh <= 0. or score <= 0.:
+                        continue
+
+                    # find best match anchor index
+                    best_iou = 0.
+                    best_idx = -1
+                    for an_idx in range(an_hw.shape[0]):
+                        iou = jaccard_overlap(
+                            [0., 0., gw, gh],
+                            [0., 0., an_hw[an_idx, 0], an_hw[an_idx, 1]])
+                        if iou > best_iou:
+                            best_iou = iou
+                            best_idx = an_idx
+
+                    gi = int(gx * grid_w)
+                    gj = int(gy * grid_h)
+
+                    # gtbox should be regresed in this layes if best match 
+                    # anchor index in anchor mask of this layer
+                    if best_idx in mask:
+                        best_n = mask.index(best_idx)
+
+                        # x, y, w, h, scale
+                        target[best_n, 0, gj, gi] = gx * grid_w - gi
+                        target[best_n, 1, gj, gi] = gy * grid_h - gj
+                        target[best_n, 2, gj, gi] = np.log(
+                            gw * w / self.anchors[best_idx][0])
+                        target[best_n, 3, gj, gi] = np.log(
+                            gh * h / self.anchors[best_idx][1])
+                        target[best_n, 4, gj, gi] = 2.0 - gw * gh
+
+                        # objectness record gt_score
+                        target[best_n, 5, gj, gi] = score
+
+                        # classification
+                        target[best_n, 6 + cls, gj, gi] = 1.
+
+                    # For non-matched anchors, calculate the target if the iou 
+                    # between anchor and gt is larger than iou_thresh
+                    if self.iou_thresh < 1:
+                        for idx, mask_i in enumerate(mask):
+                            if mask_i == best_idx: continue
+                            iou = jaccard_overlap(
+                                [0., 0., gw, gh],
+                                [0., 0., an_hw[mask_i, 0], an_hw[mask_i, 1]])
+                            if iou > self.iou_thresh and target[idx, 5, gj,
+                                                                gi] == 0.:
+                                # x, y, w, h, scale
+                                target[idx, 0, gj, gi] = gx * grid_w - gi
+                                target[idx, 1, gj, gi] = gy * grid_h - gj
+                                target[idx, 2, gj, gi] = np.log(
+                                    gw * w / self.anchors[mask_i][0])
+                                target[idx, 3, gj, gi] = np.log(
+                                    gh * h / self.anchors[mask_i][1])
+                                target[idx, 4, gj, gi] = 2.0 - gw * gh
+
+                                # objectness record gt_score
+                                target[idx, 5, gj, gi] = score
+
+                                # classification
+                                target[idx, 6 + cls, gj, gi] = 1.
+                sample['target{}'.format(i)] = target
+
+            # remove useless gt_class and gt_score after target calculated
+            sample.pop('gt_class')
+            sample.pop('gt_score')
+
+        return samples
+          ```
 ## Anchor-free  
      1. region proposal 是检测最重要的步骤，但是从生物学角度，人眼看到物体是同时定位+物体区域  
      2. 物体可以用关键点来代替（降维：二维----->一维）  
