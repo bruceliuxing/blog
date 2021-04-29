@@ -314,8 +314,14 @@
           
 12. yolov3 ground-truth
      - Gt2YoloTarget
-          * 对featureMap的每一个位置，原尺寸降采样为grid，每个像素对应三个anchor，target尺寸：(len(mask)==3, 6 + self.num_classes, grid_h, grid_w)   
-          * 3部分(13 x 13, 26 x x26, 52 x 52) 每个部分featureMap的每个三个anchor匹配IOU最大的去计算target，剩下的依据IOU>thresh的填入
+          * 对featureMap的每一个位置，原尺寸降采样为grid，每个像素对应三个anchor，target尺寸：(len(mask)==3, 6 + self.num_classes, grid_h, grid_w)
+          * 
+               anchor_masks: [[6, 7, 8], [3, 4, 5], [0, 1, 2]],   
+               anchors: [[10, 13], [16, 30], [33, 23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]],   
+               downsample_ratios: [32, 16, 8]  
+             对于每个anchor，遍历每个gt_box，算出9个anchor中与gt_box的IOU最大的，如果这个anchor在目前的anchor mask中，算出target信息，如果后续gt_box继续符合条件，覆盖写入
+          * 3部分(13 x 13, 26 x x26, 52 x 52) ,
+          * 每个部分featureMap的每个三个anchor匹配IOU最大的去计算target，剩下的依据IOU>thresh的填入
           ```
           def __call__(self, samples, context=None):
              assert len(self.anchor_masks) == len(self.downsample_ratios), \
