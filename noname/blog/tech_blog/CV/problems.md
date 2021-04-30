@@ -34,7 +34,7 @@
       ```
   - LayerNorm
     - 输入[B,N,W,H] 在[N,W,H] 做归一化,如果不指定dim时候，默认为后两个维度，即在[W,H]做归一化
-    - **参数**：gamma[B] beta[B] mean[B] var[B]  
+    - **参数**：gamma[W，H] beta[W，H] mean[B] var[B]  
     - **输出**：gamma*((input-mean)/sqrt(var)) + beta  
     - **作用**：解耦batchsize，不同样本拥有各自的平均值和标准差,在特征维度进行归一化，对每个Batch有一个均值和方差，因此不依赖于batch大小，即使batch为1也能使用。
     - **代码**：
@@ -55,13 +55,13 @@
       ```
   - InstanceNorm
     - 输入[B,N,W,H] 在[W, H] 做归一化
-    - **参数**：gamma[B*N] beta[B*N] mean[B*N] var[B*N]  
+    - **参数**：gamma[W，H] beta[W，H] mean[B*N] var[B*N]  
     - **输出**：gamma*((input-mean)/sqrt(var)) + beta  
     - **作用**：
     - **代码**：
   - GroupNorm
     - 输入[B,N,W,H] 在[N/g, W, H] 做归一化
-    - **参数**：gamma[B*g] beta[B*g] mean[B*g] var[B]  
+    - **参数**：gamma[W，H] beta[W，H] mean[B*g] var[B]  
     - **输出**：gamma*((input-mean)/sqrt(var)) + beta  
     - **作用**：对 Layer Norm 和 Instance Norm 的折中
     - **代码**：
