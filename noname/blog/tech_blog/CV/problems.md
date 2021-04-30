@@ -10,6 +10,7 @@
     - **注意**：
           - Batch Normalization不能在小数据集上进行，因为均值和方差的估计会不准确。
           - 在batch normalization的时候，我们在train和test的时候进行的操作是不同的。这是由于在test的时候, 输入数据可能只有一个data, 故不能计算均值和标准差;所以, 在test的时候, 会使用之前训练计算得到的均值和标准差做标准化。
+          - RNN变长序列计算不友好
     - **作用**：解决"Internal Covariate Shift" 问题(网络训练输入输出分布出现偏移，如sigmoid产生的值较小导致梯度消失现象，难以收敛)，但受batchsize 影响较大  
     - **代码**：
       ```
@@ -35,7 +36,7 @@
     - 输入[B,N,W,H] 在[N,W,H] 做归一化,如果不指定dim时候，默认为后两个维度，即在[W,H]做归一化
     - **参数**：gamma[B] beta[B] mean[B] var[B]  
     - **输出**：gamma*((input-mean)/sqrt(var)) + beta  
-    - **作用**：解耦batchsize，不同样本拥有各自的平均值和标准差
+    - **作用**：解耦batchsize，不同样本拥有各自的平均值和标准差,在特征维度进行归一化，对每个Batch有一个均值和方差，因此不依赖于batch大小，即使batch为1也能使用。
     - **代码**：
       ```
       import torch
