@@ -268,6 +268,7 @@
      - predict_box 和 ground-truth_box之间计算回传loss去实现精细准确框偏差  
      - predict_box偏移量是基于Anchor框的宽和高和grid的先验位置的偏移量， 宽高是以anchor的宽高为参照，中心位置以grid为参照
      - （理解有误）~~回归宽高的anchor是和ground-truth最贴合IOU最大的那个作为参照，一个GT只有一个相应的anchor，正样本比例较少~~
+     - 一个anchor对应一个gtbox（IOU最大的），但一个gtbox可以对应多个anchor，形成多个gt-anchor组合对进行wh回归loss计算  
      ```
      for i in range(3): # 针对 3 种网格尺寸
          # 设定变量，用于存储每种网格尺寸下 3 个 anchor 框的中心位置和宽高
