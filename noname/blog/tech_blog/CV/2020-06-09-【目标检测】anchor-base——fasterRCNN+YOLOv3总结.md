@@ -159,6 +159,7 @@
      $\text{b}\_{h}$ 和 $\text{b}\_{w}$ 分别表示预测框的长宽, $\text{P}\_{h}$ 和 $\text{P}\_{w}$ 分别表示先验框的长和宽。  
      $\text{t}\_{x}$ 和 $\text{t}\_{y}$ 分别表示物体中心距离网格左上角位置的偏移量, $\text{C}\_{x}$ 和 $\text{C}\_{y}$ 分别表示网格左上角的坐标。  
      ```
+     ![Image](../../blog_imgs/fasterRCNN-yolov3_anchor_gt_predictbbox.png)  
      def decode(conv_output, i=0):
          # 这里的 i=0、1 或者 2， 以分别对应三种网格尺度
          conv_shape  = tf.shape(conv_output)
