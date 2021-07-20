@@ -28,6 +28,7 @@
 >>- [transformer](blog/tech_blog/CV/transformer.md)
 
 >### Video
+>>- [光流 optical flow](blog/tech_blog/CV/video_introduction.md)
 >>- [VideoThumbnails](blog/tech_blog/CV/VedioThumbnails_yahoo_click_or_not.md)
 >>
 
