@@ -5,3 +5,4 @@
 2. [总结：光流--LK光流--基于金字塔分层的LK光流--中值流](https://blog.csdn.net/sgfmby1994/article/details/68489944)
 3. [总结：相关滤波器（Correlation Filters）](https://blog.csdn.net/sgfmby1994/article/details/68490903)
 4. [光流估计——从传统方法到深度学习](https://zhuanlan.zhihu.com/p/74460341)
+5. [万字长文漫谈视频理解](https://zhuanlan.zhihu.com/p/158702087)
