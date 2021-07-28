@@ -18,3 +18,4 @@
 6. [CentOS-7编译安装ffmpeg-4.3.1](https://blog.csdn.net/konkon2012/article/details/111871819)
 7. [Linux---centos编译安装ffmpeg](https://blog.csdn.net/loyachen/article/details/50909854)
 8. [CentOS7下编译FFMPEG源代码](https://cloud.tencent.com/developer/article/1729513)
+9. [CentOS7安装ffmpeg以及第三方依赖](http://fsemouse.com/wordpress/2019/06/04/centos7%E5%AE%89%E8%A3%85ffmpeg%E4%BB%A5%E5%8F%8A%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BE%9D%E8%B5%96/)
