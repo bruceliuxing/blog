@@ -17,3 +17,4 @@
 5. [OpenCV视频篇——视频编解码：理论基础](https://blog.csdn.net/qq_41498261/article/details/103605237?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_v2~rank_aggregation-2-103605237.pc_agg_rank_aggregation&utm_term=opencv+视频编解码&spm=1000.2123.3001.4430)
 6. [CentOS-7编译安装ffmpeg-4.3.1](https://blog.csdn.net/konkon2012/article/details/111871819)
 7. [Linux---centos编译安装ffmpeg](https://blog.csdn.net/loyachen/article/details/50909854)
+8. [CentOS7下编译FFMPEG源代码](https://cloud.tencent.com/developer/article/1729513)
