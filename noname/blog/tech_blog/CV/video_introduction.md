@@ -21,3 +21,6 @@
 9. [CentOS7安装ffmpeg以及第三方依赖](http://fsemouse.com/wordpress/2019/06/04/centos7%E5%AE%89%E8%A3%85ffmpeg%E4%BB%A5%E5%8F%8A%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BE%9D%E8%B5%96/)
 10. [[总结]FFMPEG视音频编解码零基础学习方法](https://blog.csdn.net/leixiaohua1020/article/details/15811977)
 
+### 音视频处理
+1. [Python 处理音频文件的实用姿势](https://xie.infoq.cn/article/bfc0575ba0e79a7e535d5c081)
+2. [Python 处理视频文件的实用姿势](https://xie.infoq.cn/article/b4904c8e7aa2d8413bc06316f)
