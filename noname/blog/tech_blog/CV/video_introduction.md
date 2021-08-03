@@ -20,7 +20,8 @@
 8. [CentOS7下编译FFMPEG源代码](https://cloud.tencent.com/developer/article/1729513)
 9. 链接8和10中--enable-libfreetype需要编译freetype2(https://sourceforge.net/projects/freetype/files/freetype2/2.11.0/freetype-2.11.0.tar.gz)
 10. [CentOS7安装ffmpeg以及第三方依赖](http://fsemouse.com/wordpress/2019/06/04/centos7%E5%AE%89%E8%A3%85ffmpeg%E4%BB%A5%E5%8F%8A%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BE%9D%E8%B5%96/)
-11. [[总结]FFMPEG视音频编解码零基础学习方法](https://blog.csdn.net/leixiaohua1020/article/details/15811977)
+11. [centos编译安装ffmpeg过程](https://www.codenong.com/cs105243951/)
+12. [[总结]FFMPEG视音频编解码零基础学习方法](https://blog.csdn.net/leixiaohua1020/article/details/15811977)
 
 ### 音视频处理
 1. [Python 处理音频文件的实用姿势](https://xie.infoq.cn/article/bfc0575ba0e79a7e535d5c081)
